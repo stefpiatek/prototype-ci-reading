@@ -7,6 +7,7 @@ the project managment interest resides.
 
 import json
 import pathlib
+from collections.abc import Iterator
 from enum import Enum
 
 import git
@@ -176,6 +177,14 @@ class Issue:
 
         The title of the issue, such as is visible in issue lists.
         """
+        raise NotImplementedError
+
+    def body(self) -> str:
+        """Get the body text."""
+        raise NotImplementedError
+
+    def linked_issues(self) -> Iterator["Issue"]:
+        """Get a list of issues linked to this one."""
         raise NotImplementedError
 
 

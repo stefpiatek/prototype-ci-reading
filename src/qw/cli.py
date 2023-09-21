@@ -137,7 +137,11 @@ def check():
     conf = qw.service.get_configuration()
     service = qw.factory.get_service(conf)
     sys.stdout.write(str(conf))
-    sys.stdout.write(service.get_issue(1).title())
+    issue = service.get_issue(10)
+    sys.stdout.write(issue.title() + "\n")
+    sys.stdout.write(issue.body() + "\n")
+    for i in issue.linked_issues():
+        sys.stdout.write(f"is linked to: '{i.title()}'\n")
 
 
 if __name__ == "__main__":
