@@ -48,11 +48,18 @@ class Issue(qw.service.Issue):
 class Service(qw.service.GitService):
     """The github service."""
 
-    def __init__(self, conf):
+    def __init__(
+        self,
+        conf,
+        auth_token=None,
+    ):
         """Log in with the gh auth token."""
         super().__init__(conf)
-        token = keyring.get_password("gh:github.com", "")
-        self.gh = github3.login(token=token)
+        if auth_token is None:
+            auth_token = keyring.get_password("gh:github.com", "")
+        else:
+            keyring.set_keyring("gh:github.com", "", auth_token)
+        self.gh = github3.login(token=auth_token)
 
     def get_issue(self, number: int):
         """Get the issue with the specified number."""
