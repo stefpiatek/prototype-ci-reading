@@ -7,6 +7,7 @@ Helps enforce regulatory compliance for projects managed on github.
 import json
 import sys
 from enum import Enum
+from getpass import getpass
 from typing import Annotated, Optional
 
 import git
@@ -29,7 +30,7 @@ class LogLevel(Enum):
     DEBUG = "debug"
 
 
-LOGELEVEL_TO_LOGURU = {
+LOGLEVEL_TO_LOGURU = {
     LogLevel.DEBUG: 10,
     LogLevel.INFO: 20,
     LogLevel.WARNING: 30,
@@ -53,7 +54,7 @@ def main(
     """
     logger.remove()
     if loglevel is not None:
-        logger.add(sys.stderr, level=LOGELEVEL_TO_LOGURU[loglevel])
+        logger.add(sys.stderr, level=LOGLEVEL_TO_LOGURU[loglevel])
 
 
 @app.command()
@@ -137,7 +138,22 @@ def check():
     conf = qw.service.get_configuration()
     service = qw.factory.get_service(conf)
     sys.stdout.write(str(conf))
-    sys.stdout.write(service.get_issue(1).title())
+    issue = service.get_issue(10)
+    sys.stdout.write(issue.title() + "\n")
+    sys.stdout.write(issue.body() + "\n")
+    for i in issue.linked_issues():
+        sys.stdout.write(f"is linked to: '{i.title()}'\n")
+
+
+@app.command()
+def login():
+    """Set the authorization token for the hosting service."""
+    conf = qw.service.get_configuration()
+    auth_token = getpass(
+        prompt="Please copy the personal access token and hit enter:",
+    )
+    qw.factory.get_service(conf, auth_token=auth_token)
+    logger.info('Can access "{repo}"', repo=conf["repo_url"])
 
 
 if __name__ == "__main__":
