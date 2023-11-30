@@ -5,7 +5,10 @@ import qw.service
 from qw.base import QwError
 
 
-def get_service(conf: dict | None = None) -> qw.service.GitService:
+def get_service(
+    conf: dict | None = None,
+    auth_token: str | None = None,
+) -> qw.service.GitService:
     """Return a git hosting service."""
     if conf is None:
         conf = qw.service.get_configuration()
@@ -16,7 +19,10 @@ def get_service(conf: dict | None = None) -> qw.service.GitService:
             msg,
         )
     if name == str(qw.service.Service.GITHUB):
-        return qw.github.Service(conf)
+        return qw.github.Service(
+            conf,
+            auth_token=auth_token,
+        )
     msg = f"Do not know how to connect to the {name} service!"
     raise QwError(
         msg,
